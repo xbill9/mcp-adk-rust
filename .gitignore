@@ -6,6 +6,8 @@ yarn-error.log*
 
 .aws_creds
 
+basic_agent/.adk/
+
 # OS
 .DS_Store
 .DS_Store?

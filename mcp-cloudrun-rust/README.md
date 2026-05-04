@@ -1,40 +1,74 @@
 # mcp-https-rust
 
-A Rust application that interacts via streaming http using the MCP protocol.
+A Rust-based Model Context Protocol (MCP) server designed for deployment on Google Cloud Run, utilizing streaming HTTP.
 
 ## Overview
+
+This project implements an MCP server using the [`rmcp`](https://github.com/modelcontextprotocol/rust-sdk) library and the [`axum`](https://docs.rs/axum/latest/axum/) web framework. It provides a `greeting` tool and is optimized for high-performance, streaming communication over HTTP.
+
+## Features
+
+- **MCP Tooling**: Implements a `greeting` tool.
+- **Streaming HTTP**: Uses `rmcp`'s `StreamableHttpService` for efficient JSON-RPC over HTTP.
+- **Cloud Native**: Pre-configured for Google Cloud Run with a `/health` check endpoint and Docker support.
+- **Graceful Shutdown**: Handles SIGINT and SIGTERM for clean exits.
 
 ## Getting Started
 
 ### Prerequisites
 
-Ensure you have the Rust toolchain installed:
-
-*   [Rust Toolchain](https://www.rust-lang.org/tools/install)
+- [Rust Toolchain](https://www.rust-lang.org/tools/install) (2024 edition)
+- [Docker](https://docs.docker.com/get-docker/) (for containerization)
+- [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) (for deployment)
 
 ### Build
 
-To build the project:
+To build the project for release:
 
 ```bash
 cargo build --release
 ```
 
-### Run
+### Run Locally
 
-To run the application, you can pipe input to it and capture its output:
-
-```bash
-echo "your_input_here" | target/release/mcp-stdio-rust
-```
-
-Or, for interactive use:
+The server listens on the port specified by the `PORT` environment variable (default: `8080`).
 
 ```bash
-target/release/mcp-https-rust
+# Using Makefile
+make run
+
+# Or directly
+cargo run --release
 ```
-Then type your input and press Enter. The application will print its response to stdout.
+
+The server will be available at `http://localhost:8080`.
+You can check the health at `http://localhost:8080/health`.
+
+### Development Targets
+
+The `Makefile` provides several useful targets:
+
+- `make test`: Run unit tests.
+- `make clippy`: Run linting checks.
+- `make fmt`: Check code formatting.
+- `make start`: Start the server in the background (logs to `server.log`).
+- `make stop`: Stop the background server.
+- `make status`: Check the status of the background server.
+
+## Deployment
+
+To deploy the application to Google Cloud Run using Google Cloud Build:
+
+```bash
+make deploy
+```
+
+This will build the Docker image and deploy it to the configured service.
 
 ## Protocol Details
 
-This impliments a minimially viable MCP streaming http server in Rust.
+This implementation follows the Model Context Protocol (MCP) using the streaming HTTP transport. Sessions are managed locally via `LocalSessionManager`.
+
+## License
+
+MIT

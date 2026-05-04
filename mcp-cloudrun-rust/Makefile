@@ -4,7 +4,7 @@
 SERVICE_NAME := mcp-https-rust
 REGION := us-central1
 
-.PHONY: all build run clean release test fmt clippy check docker-build deploy help
+.PHONY: all build run clean release test fmt clippy check docker-build deploy start stop status help
 
 # The default target
 all: build
@@ -13,15 +13,48 @@ all: build
 build:
 	@echo "Building the Rust project..."
 	@cargo build
+
 # Run the project
 run:
 	@echo "Running the Rust project..."
-	@cargo run  --release
+	@cargo run --release
+
+# Start the server in the background
+start: release
+	@echo "Starting the MCP server..."
+	@nohup ./target/release/$(SERVICE_NAME) > server.log 2>&1 & echo $$! > server.pid
+	@echo "Server started with PID $$(cat server.pid)"
+
+# Stop the background server
+stop:
+	@if [ -f server.pid ]; then \
+		PID=$$(cat server.pid); \
+		echo "Stopping $(SERVICE_NAME) (PID $$PID)..."; \
+		kill $$PID || true; \
+		rm server.pid; \
+	else \
+		echo "$(SERVICE_NAME) is not running."; \
+	fi
+
+# Get the status of the background server
+status:
+	@if [ -f server.pid ]; then \
+		PID=$$(cat server.pid); \
+		if ps -p $$PID > /dev/null; then \
+			echo "$(SERVICE_NAME) is running (PID $$PID)."; \
+		else \
+			echo "$(SERVICE_NAME) PID file exists but process is not running."; \
+			rm server.pid; \
+		fi \
+	else \
+		echo "$(SERVICE_NAME) is not running."; \
+	fi
 
 # Clean the project
 clean:
 	@echo "Cleaning the project..."
 	@cargo clean
+	@rm -f server.pid server.log
 
 # Build the project for release
 release:
@@ -73,6 +106,9 @@ help:
 	@echo "    all          (default) same as 'build'"
 	@echo "    build        Build the project for development"
 	@echo "    run          Run the project"
+	@echo "    start        Start the server in the background"
+	@echo "    stop         Stop the background server"
+	@echo "    status       Get the status of the background server"
 	@echo "    clean        Clean the project"
 	@echo "    release      Build the project for release"
 	@echo "    test         Run tests"
