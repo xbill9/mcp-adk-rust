@@ -9,7 +9,7 @@ load_dotenv()
 
 # The MCP server is expected to be running at this URL.
 # In a real scenario, this would be the Cloud Run URL.
-MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8080")
+MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8080/mcp")
 
 root_agent = LlmAgent(
     name="basic_mcp_agent",
@@ -19,7 +19,8 @@ root_agent = LlmAgent(
         McpToolset(
             connection_params=StreamableHTTPConnectionParams(
                 url=MCP_SERVER_URL,
-            )
+            ),
+            tool_filter=["greeting"],
         )
     ],
 )
