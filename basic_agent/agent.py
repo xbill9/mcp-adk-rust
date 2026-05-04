@@ -13,7 +13,7 @@ MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8080")
 
 root_agent = LlmAgent(
     name="basic_mcp_agent",
-    model=os.getenv("GENAI_MODEL", "gemini-1.5-flash"),
+    model=os.getenv("GENAI_MODEL", "gemini-2.5-flash"),
     instruction="You are a helpful assistant that uses tools from an MCP server to greet people. Use the 'greeting' tool when asked to greet someone.",
     tools=[
         McpToolset(
